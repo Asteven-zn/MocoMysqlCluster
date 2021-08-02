@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: moco-mysql
+  name: mocomysql-exporter
+  namespace: monitoring
+spec:
+  endpoints:
+    - honorLabels: true
+      interval: 30s
+      path: /metrics
+      port: port
+  jobLabel: moco-mysql
+  namespaceSelector:
+    matchNames:
+      - moco-demo
+  selector:
+    matchLabels:
+      cattle.io/creator: norman

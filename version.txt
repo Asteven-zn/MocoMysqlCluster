@@ -1,0 +1,2 @@
+moco:v0.10.4
+github:https://github.com/cybozu-go/moco/tree/v0.10.4

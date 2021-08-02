@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sysbench
+  namespace: moco-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sysbench
+  template:
+    metadata:
+      labels:
+        app: sysbench
+    spec:
+      nodeSelector:
+        test: sysbench
+      containers:
+      - args:
+        - /bin/bash
+        image: sysbench:new
+        imagePullPolicy: IfNotPresent
+        name: sysbench
+#        command: ["tail","-f","/var/log/messages"]
+#        command:
+#        - sysbench
+#        - --db-driver=mysql
+#        - --oltp-table-size=100000
+#        - --oltp-tables-count=24
+#        - --threads=1
+#        - --mysql-host=galera
+#        - --mysql-port=3306
+#        - --mysql-user=sbtest
+#        - --mysql-password=password
+#        - /usr/share/sysbench/tests/include/oltp_legacy/parallel_prepare.lua
+#        - run
+#        ports:
+#        - containerPort: 80
+#          name: http
+#          protocol: TCP
+#        resources:
+#          requests:
+#            cpu: 100m
+#            memory: 128m
+      restartPolicy: Always
