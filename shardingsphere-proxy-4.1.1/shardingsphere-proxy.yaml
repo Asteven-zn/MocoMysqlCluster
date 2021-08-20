@@ -1,0 +1,139 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mocomysql
+  namespace: mysql-test
+  labels:
+    app: shardingsphere-proxy
+spec:
+  ports:
+  - name: shardingsphere-proxyout
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  type: ClusterIP
+  #type: NodePort
+  clusterIP: None
+  selector:
+    app: shardingsphere-proxy
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: shardingsphere-proxy
+  name: shardingsphere-proxy
+  namespace: mysql-test
+
+spec:
+  replicas: 1
+  serviceName: shardingsphere-proxy
+  selector:
+    matchLabels:
+      app: shardingsphere-proxy
+
+  template:
+    metadata:
+      labels:
+        app: shardingsphere-proxy
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - shardingsphere-proxy
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - image: cloudhere/sharding-proxy:4.1.1
+          name: sharding-proxy
+          imagePullPolicy: IfNotPresent
+          #ports:
+          #  - containerPort: 3308
+          #    name: proxyport
+          env:
+            - name: PORT
+              value: "3306"
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+
+            - name: config-encrypt
+              mountPath: /opt/shardingsphere-proxy/conf/config-encrypt.yaml
+              subPath: config-encrypt.yaml
+
+            #config-readwrite-splitting
+            - name: config-data-simulator-test
+              mountPath: /opt/shardingsphere-proxy/conf/config-master_slave.yaml
+              subPath: config-master_slave.yaml
+
+            - name: config-open-platform-test
+              mountPath: /opt/shardingsphere-proxy/conf/config-master_slave2.yaml
+              subPath: config-master_slave2.yaml
+            #config-readwrite-splitting end
+
+            - name: config-shadow
+              mountPath: /opt/shardingsphere-proxy/conf/config-shadow.yaml
+              subPath: config-shadow.yaml
+
+            - name: config-sharding
+              mountPath: /opt/shardingsphere-proxy/conf/config-sharding.yaml
+              subPath: config-sharding.yaml
+
+            - name: server
+              mountPath: /opt/shardingsphere-proxy/conf/server.yaml
+              subPath: server.yaml
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ""
+
+        - name: config-encrypt
+          configMap:
+            name: config-encrypt
+            items:
+            - key: config-encrypt.yaml
+              path: config-encrypt.yaml
+
+        #config-readwrite-splitting
+        - name: config-data-simulator-test
+          configMap:
+            name: config-data-simulator-test
+            items:
+            - key: config-master_slave.yaml
+              path: config-master_slave.yaml
+
+        - name: config-open-platform-test
+          configMap:
+            name: config-open-platform-test
+            items:
+            - key: config-master_slave2.yaml
+              path: config-master_slave2.yaml
+        #config-readwrite-splitting end
+
+        - name: config-shadow
+          configMap:
+            name: config-shadow
+            items:
+            - key: config-shadow.yaml
+              path: config-shadow.yaml
+
+        - name: config-sharding
+          configMap:
+            name: config-sharding
+            items:
+            - key: config-sharding.yaml
+              path: config-sharding.yaml
+
+        - name: server
+          configMap:
+            name: server
+            items:
+            - key: server.yaml
+              path: server.yaml

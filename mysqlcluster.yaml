@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: moco-demo
-  name: mycnf
+  namespace: mysql-test
+  name: mocomycnf
 data:
   long_query_time: "0"
   innodb_log_file_size: "10M"
@@ -12,17 +12,17 @@ data:
 apiVersion: moco.cybozu.com/v1beta1
 kind: MySQLCluster
 metadata:
-  namespace: moco-demo
+  namespace: mysql-test
   name: mysql
 spec:
   replicas: 3
-  mysqlConfigMapName: mycnf
+  mysqlConfigMapName: mocomycnf
   collectors:
   - engine_innodb_status
   - info_schema.innodb_metrics
-  #serviceTemplate : 
-  #  spec : 
-  #    type : LoadBalancer
+  serviceTemplate : 
+    spec : 
+      type : NodePort
   podTemplate:
     spec:
       affinity:
@@ -41,21 +41,23 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: mysqld
+        #image: harbor-dev.tcsa.tk/moco/cybozu/mysql:8.0.25
         image: quay.io/cybozu/mysql:8.0.25
-        resources:
-          requests:
-            cpu: "2"
-            memory: "2Gi"
-          limits:
-            cpu: "2"
-            memory: "2Gi"
+        #resources:
+        #  requests:
+        #    cpu: "2"
+        #    memory: "2Gi"
+        #  limits:
+        #    cpu: "2"
+        #    memory: "4Gi"
   volumeClaimTemplates:
   - metadata:
       name: mysql-data
       annotations:
+        #volume.beta.kubernetes.io/storage-class: "ceph-rbd"
         volume.beta.kubernetes.io/storage-class: "local-path"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 1Gi
+          storage: 10Gi

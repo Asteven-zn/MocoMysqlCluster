@@ -16966,7 +16966,7 @@ spec:
                       valueFrom:
                         fieldRef:
                             fieldPath: metadata.namespace
-                  image: quay.io/jetstack/cert-manager-cainjector:v1.4.0
+                  image: harbor-dev.tcsa.tk/moco/jetstack/cert-manager-cainjector:v1.4.0
                   imagePullPolicy: IfNotPresent
                   name: cert-manager
                   resources: {}
@@ -17017,7 +17017,7 @@ spec:
                       valueFrom:
                         fieldRef:
                             fieldPath: metadata.namespace
-                  image: quay.io/jetstack/cert-manager-controller:v1.4.0
+                  image: harbor-dev.tcsa.tk/moco/jetstack/cert-manager-controller:v1.4.0
                   imagePullPolicy: IfNotPresent
                   name: cert-manager
                   ports:
@@ -17069,7 +17069,7 @@ spec:
                       valueFrom:
                         fieldRef:
                             fieldPath: metadata.namespace
-                  image: quay.io/jetstack/cert-manager-webhook:v1.4.0
+                  image: harbor-dev.tcsa.tk/moco/jetstack/cert-manager-webhook:v1.4.0
                   imagePullPolicy: IfNotPresent
                   livenessProbe:
                     failureThreshold: 3
